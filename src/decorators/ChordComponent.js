@@ -1,20 +1,33 @@
 import React from 'react';
 
-function ChordComponent(props) {
+class ChordComponent extends React.Component {
 
-  const styles = {
-    chord: {
-      backgroundColor: '#9b9bf9',
-      borderRadius: '0.2rem',
-      cursor: 'pointer'
-    }
-  };
+  constructor(props) {
+    console.log('start: ', props.start, props.end);
+    super(props);
+    this.props = props;
+    this.styles = {
+      chord: {
+        backgroundColor: '#9b9bf9',
+        borderRadius: '0.2rem',
+        cursor: 'pointer'
+      }
+    };
 
-  return (
-    <span style={styles.chord} onClick={props.setSelection}>
-      {props.children}
-    </span>
-  )
+  }
+
+  handleClick() {
+    this.props.setSelection(this.props.start, this.props.end);
+  }
+
+  render() {
+    return (
+      <span style={this.styles.chord} onMouseDown={this.handleClick.bind(this)}>
+        {this.props.children}
+      </span>
+    )
+  }
+
 }
 
 export default ChordComponent;

@@ -1,59 +1,71 @@
 import React from 'react';
-import { Editor, EditorState, CompositeDecorator } from 'draft-js';
+import { Editor, EditorState, ContentState, CompositeDecorator } from 'draft-js';
 import './App.css';
-
 
 import ChordComponent from './decorators/ChordComponent';
 
-function App() {
+class App extends React.Component {
 
-  const decorators = new CompositeDecorator([
-    {
-      strategy: chordStrategy,
-      component: ChordComponent,
-      props: {
-        setSelection
+  constructor(props) {
+    super(props);
+    const decorators = new CompositeDecorator([
+      {
+        strategy: this.chordStrategy,
+        component: ChordComponent,
+        props: {
+          setSelection: this.setSelection.bind(this)
+        }
+      }
+    ]);
+
+    const content = ContentState.createFromText("Say [A]and [B] and [C]");
+    this.state = { editorState: EditorState.createWithContent(content, decorators) };
+    this.onChange = editorState => this.setState({editorState});
+
+    this.updateEditorState = this.updateEditorState.bind(this);
+    this.setSelection = this.setSelection.bind(this);
+  }
+
+  updateEditorState(newEditorState) {
+    this.setState({editorState: newEditorState});
+  }
+
+  chordStrategy(contentBlock, callback, contentState) {
+
+    function findWithRegex(regex, contentBlock, callback) {
+      const text = contentBlock.getText();
+      let matchArr, start;
+      while ((matchArr = regex.exec(text)) !== null) {
+        start = matchArr.index;
+        callback(start, start + matchArr[0].length);
       }
     }
-  ]);
-
-  const [editorState, setEditorState] = React.useState(
-    () => EditorState.createEmpty(decorators),
-  );
-
-  function chordStrategy(contentBlock, callback, contentState) {
     findWithRegex(/\[.?\]/g, contentBlock, callback);
   };
 
-  function findWithRegex(regex, contentBlock, callback) {
-    const text = contentBlock.getText();
-    let matchArr, start;
-    while ((matchArr = regex.exec(text)) !== null) {
-      start = matchArr.index;
-      callback(start, start + matchArr[0].length);
-    }
-  }
 
 
-  function setSelection() {
-    const selectionState = editorState.getSelection();
+  setSelection(selectionStart, selectionEnd) {
+    const selectionState = this.state.editorState.getSelection();
     const newSelectionState = selectionState.merge({
-      anchorOffset: 3,
-      focusOffset: 10
+      anchorOffset: selectionStart,
+      focusOffset: selectionEnd
     });
 
-    const newEditorState = EditorState.forceSelection(editorState, newSelectionState);
+    const newEditorState = EditorState.forceSelection(this.state.editorState, newSelectionState);
 
-    setEditorState(newEditorState);
+    this.setState({editorState: newEditorState});
   }
 
-  return (
-    <div className="App">
-      <button onClick={setSelection}>Set selection</button>
-      <h1>Draft.js Experiments</h1>
-      <Editor editorState={editorState} onChange={setEditorState} />
-    </div>
-  );
+  render() {
+    return (
+      <div className="App">
+        <button onClick={this.setSelection}>Set selection</button>
+        <h1>Draft.js Experiments</h1>
+        <Editor editorState={this.state.editorState} onChange={this.updateEditorState} />
+      </div>
+    );
+  }
 }
 
 export default App;
