@@ -18,7 +18,7 @@ class App extends React.Component {
       }
     ]);
 
-    const content = ContentState.createFromText("Say [A]and [B] and [C]");
+    const content = ContentState.createFromText("Say [A]and [B] and [C]\n and more [G] chords on the [F]next line");
     this.state = { editorState: EditorState.createWithContent(content, decorators) };
     this.updateEditorState = this.updateEditorState.bind(this);
     this.setSelection = this.setSelection.bind(this);
