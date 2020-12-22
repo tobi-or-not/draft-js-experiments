@@ -3,7 +3,6 @@ import React from 'react';
 class ChordComponent extends React.Component {
 
   constructor(props) {
-    console.log('start: ', props.start, props.end);
     super(props);
     this.props = props;
     this.styles = {
@@ -17,7 +16,11 @@ class ChordComponent extends React.Component {
   }
 
   handleClick() {
-    this.props.setSelection(this.props.start, this.props.end);
+    this.props.setSelection(
+      this.props.start,
+      this.props.end,
+      this.props.blockKey
+    );
   }
 
   render() {

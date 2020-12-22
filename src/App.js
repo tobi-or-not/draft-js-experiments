@@ -1,5 +1,5 @@
 import React from 'react';
-import { Editor, EditorState, ContentState, CompositeDecorator } from 'draft-js';
+import { Editor, EditorState, ContentState, CompositeDecorator, SelectionState } from 'draft-js';
 import './App.css';
 
 import ChordComponent from './decorators/ChordComponent';
@@ -20,8 +20,6 @@ class App extends React.Component {
 
     const content = ContentState.createFromText("Say [A]and [B] and [C]");
     this.state = { editorState: EditorState.createWithContent(content, decorators) };
-    this.onChange = editorState => this.setState({editorState});
-
     this.updateEditorState = this.updateEditorState.bind(this);
     this.setSelection = this.setSelection.bind(this);
   }
@@ -45,11 +43,11 @@ class App extends React.Component {
 
 
 
-  setSelection(selectionStart, selectionEnd) {
-    const selectionState = this.state.editorState.getSelection();
+  setSelection(selectionStart, selectionEnd, blockKey) {
+    const selectionState = SelectionState.createEmpty(blockKey);
     const newSelectionState = selectionState.merge({
       anchorOffset: selectionStart,
-      focusOffset: selectionEnd
+      focusOffset: selectionEnd,
     });
 
     const newEditorState = EditorState.forceSelection(this.state.editorState, newSelectionState);
